@@ -1,26 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import getYouTubeID from "get-youtube-id";
+import fileDownload from "js-file-download";
+import axios from "axios";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoURL = urlParams.get("videoURL");
+    let videoID;
+
+    if (videoURL) {
+      videoID = getYouTubeID(videoURL);
+
+      axios({
+        url: `https://yeetube.herokuapp.com/download/${videoID}`,
+        method: "POST",
+        responseType: "blob",
+      }).then((res) => {
+        fileDownload(res.data, res.headers.filename);
+      });
+    }
+  }, []);
+
+  return <h1>This is an AHSOME YeeTube downloader baby</h1>;
 }
 
 export default App;
